@@ -100,3 +100,53 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+MY_LOGGING = {
+    'version': 1,
+    # 'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            '()': 'colorlog.ColoredFormatter',
+            "format": "%(log_color)s %(levelname)-8s %(asctime)s %(process)s --- %(lineno)-8s [%(name)s] %(funcName)-24s : %(message)s",
+            "log_colors": {
+                "DEBUG": "blue",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+        'short': {
+           'format': '%(levelname)s : %(message)s'
+       }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'mongodb_handler': {
+            'class': 'config.custom_log_handler.DatabaseLoggingHandler',
+            'formatter': 'short',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['console', 'mongodb_handler'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
+
+import logging.config
+
+LOGGING_CONFIG = None
+
+logging.config.dictConfig(MY_LOGGING)
